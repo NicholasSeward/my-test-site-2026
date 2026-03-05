@@ -1,5 +1,11 @@
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="An interactive frog spinning game as a Progressive Web App">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><text y='150' font-size='150'>🐸</text></svg>">
     <title>Frogs</title>
     <style>
       img {
@@ -16,7 +22,6 @@
           transform: rotate(360deg);
         }
       }
-     
     </style>
   </head>
   <body>
@@ -27,6 +32,15 @@
     <p id="spin-counter">Spins: 0</p>
 
     <script>
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js').then(registration => {
+          console.log('Service Worker registered:', registration);
+        }).catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+      }
+
       let spinCount = 0;
       const frogImage = document.getElementById('frog-image');
       const counterDisplay = document.getElementById('spin-counter');
