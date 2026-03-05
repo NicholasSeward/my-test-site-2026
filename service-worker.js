@@ -1,6 +1,5 @@
 const CACHE_NAME = 'frogs-pwa-v1';
 const urlsToCache = [
-  '/',
   '/index.html',
   '/manifest.json',
   '/frog.jpg'
@@ -39,6 +38,17 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  let requestUrl = new URL(event.request.url);
+  
+  // For navigation requests to root, serve index.html
+  if (event.request.mode === 'navigate' && requestUrl.pathname === '/') {
+    event.respondWith(
+      caches.match('/index.html')
+        .then(response => response || fetch('/index.html'))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -65,14 +75,9 @@ self.addEventListener('fetch', event => {
         });
       })
       .catch(() => {
-        // Return offline page or default response
-        return new Response('Offline - please check your connection', {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: new Headers({
-            'Content-Type': 'text/plain'
-          })
-        });
+        // Return cached index.html as fallback for offline navigation
+        return caches.match('/index.html')
+          .then(response => response || new Response('Offline - page not cached', {status: 503}));
       })
   );
 });
